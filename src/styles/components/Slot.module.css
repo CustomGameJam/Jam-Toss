@@ -1,0 +1,8 @@
+.slot {
+    transform: rotate(45deg);
+    width: 12px;
+    height: 24px;
+    background: yellow;
+    z-index: 999;
+}
+
