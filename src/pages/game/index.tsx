@@ -6,8 +6,6 @@ const {useRouter} = require("next/router");
 const Game = () => {
     const router = useRouter();
     const {setScore} = useGameContext();
-    const [game, setGame] = useState(null);
-    const [isGameRunning, setIsGameRunning] = useState(true);
     useEffect(() => {
         async function initPhaser() {
             const Phaser = await import("phaser");
@@ -46,7 +44,7 @@ const Game = () => {
                         gridAlign: {width: 10, height: 6, cellWidth: 128 + 60, cellHeight: 32 + 60, x: 240, y: 150}
                     });
 
-                    this.ball = this.physics.add.sprite(400, 800, 'cherry').setCollideWorldBounds(true).setBounce(1);
+                    this.ball = this.physics.add.sprite(400, 800, 'jar').setCollideWorldBounds(true).setBounce(1).setScale(1.5);
                     this.ball.setData('onPaddle', true);
 
                     this.paddle = this.physics.add.sprite(400, 880, 'hand').setImmovable();
@@ -94,7 +92,10 @@ const Game = () => {
                 update: function () {
                     if (this.ball.y > 900) {
                         setScore(this.score);
-                        setIsGameRunning(false);
+                        game.destroy(true);
+                        setTimeout(() => {
+                            router.push('/gameover');
+                        }, 1000);
                     }
                 }
 
@@ -119,20 +120,10 @@ const Game = () => {
             };
 
             var game = new Phaser.Game(config);
-            setGame(game as any);
         }
 
         initPhaser();
     }, []);
-
-    console.log(game)
-
-    useEffect(() => {
-        if (!isGameRunning) {
-            game.destroy(true);
-            router.push('/gameover');
-        }
-    }, [isGameRunning]);
 
     return <div id="game-container"/>;
 };
