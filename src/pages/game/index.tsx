@@ -6,15 +6,15 @@ const Game = () => {
         async function initPhaser() {
             const Phaser = await import("phaser");
 
-            var Breakout = new Phaser.Class({
+            const Pachinko = new Phaser.Class({
 
                 Extends: Phaser.Scene,
 
                 initialize:
 
-                    function Breakout ()
+                    function Pachinko ()
                     {
-                        Phaser.Scene.call(this, { key: 'breakout' });
+                        Phaser.Scene.call(this, { key: 'pachinko' });
 
                         this.bricks;
                         this.paddle;
@@ -23,13 +23,14 @@ const Game = () => {
 
                 preload: function ()
                 {
-                    this.load.atlas('assets', 'assets/games/breakout/breakout.png', 'assets/games/breakout/breakout.json');
+                    this.load.image('cherry', 'assets/image/cherry.png', 20, 20);
+                    this.load.image('jar', 'assets/image/jar.png', 20, 20);
                 },
 
                 create: function ()
                 {
                     //  Enable world bounds, but disable the floor
-                    this.physics.world.setBoundsCollision(true, true, false, false);
+                    this.physics.world.setBoundsCollision(true, true, true, false);
 
                     //  Create the bricks in a 10x6 grid
                     this.bricks = this.physics.add.staticGroup({
@@ -38,7 +39,7 @@ const Game = () => {
                         gridAlign: { width: 10, height: 6, cellWidth: 128 + 30, cellHeight: 32 + 30, x: 240, y: 150 }
                     });
 
-                    this.ball = this.physics.add.image(400, 500, 'assets', 'cherry').setCollideWorldBounds(true).setBounce(1);
+                    this.ball = this.physics.add.sprite(400,500, 'cherry').setCollideWorldBounds(true).setScale(0.2).setBounce(1);
                     this.ball.setData('onPaddle', true);
 
                     this.paddle = this.physics.add.image(400, 550, 'assets', 'paddle1').setImmovable();
@@ -134,12 +135,12 @@ const Game = () => {
             });
 
             var config = {
-                type: Phaser.WEBGL,
+                type: Phaser.AUTO,
                 width: 1920,
                 height: 1080,
                 parent: "game-container",
                 title: "Pachinko",
-                scene: [ Breakout ],
+                scene: [ Pachinko ],
                 physics: {
                     default: 'arcade'
                 }
