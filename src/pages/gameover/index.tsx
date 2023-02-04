@@ -2,8 +2,10 @@ import { Col, Row, Container } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import {useGameContext} from "context/GameContext";
 
 const GameOver = () => {
+    const {score} = useGameContext();
     return (
         <div className='p-3 fullH' style={{ backgroundColor: 'black' }}>
 
@@ -16,7 +18,7 @@ const GameOver = () => {
                 <Col xs={12}>
                     <div className='writeEditing mb-5'>
                         <h4>Score</h4>
-                        <h1>90</h1>
+                        <h1>{score}</h1>
                     </div>
 
                 </Col>

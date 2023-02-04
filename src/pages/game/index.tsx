@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useGameContext} from "context/GameContext";
 
 const {useRouter} = require("next/router");
@@ -6,6 +6,8 @@ const {useRouter} = require("next/router");
 const Game = () => {
     const router = useRouter();
     const {setScore} = useGameContext();
+    const [game, setGame] = useState(null);
+    const [isGameRunning, setIsGameRunning] = useState(true);
     useEffect(() => {
         async function initPhaser() {
             const Phaser = await import("phaser");
@@ -92,7 +94,7 @@ const Game = () => {
                 update: function () {
                     if (this.ball.y > 900) {
                         setScore(this.score);
-                        router.push('/gameover');
+                        setIsGameRunning(false);
                     }
                 }
 
@@ -117,10 +119,20 @@ const Game = () => {
             };
 
             var game = new Phaser.Game(config);
+            setGame(game as any);
         }
 
         initPhaser();
     }, []);
+
+    console.log(game)
+
+    useEffect(() => {
+        if (!isGameRunning) {
+            game.destroy(true);
+            router.push('/gameover');
+        }
+    }, [isGameRunning]);
 
     return <div id="game-container"/>;
 };
