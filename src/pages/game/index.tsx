@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
+import {useGameContext} from "context/GameContext";
+
 const {useRouter} = require("next/router");
 
 const Game = () => {
     const router = useRouter();
-    const [score, setScore] = useState(0);
-    const [isGameOver, setIsGameOver] = useState(false);
+    const {setScore} = useGameContext();
     useEffect(() => {
         async function initPhaser() {
             const Phaser = await import("phaser");
@@ -15,9 +16,8 @@ const Game = () => {
 
                 initialize:
 
-                    function Pachinko ()
-                    {
-                        Phaser.Scene.call(this, { key: 'pachinko' });
+                    function Pachinko() {
+                        Phaser.Scene.call(this, {key: 'pachinko'});
 
                         this.bricks;
                         this.paddle;
@@ -27,29 +27,28 @@ const Game = () => {
                         this.score = 0;
                     },
 
-                preload: function ()
-                {
+                preload: function () {
                     this.load.image('cherry', 'assets/image/cherry.png');
                     this.load.image('jar', 'assets/image/jar.png');
+                    this.load.image('hand', 'assets/image/hand.png');
                 },
 
-                create: function ()
-                {
+                create: function () {
                     //  Enable world bounds, but disable the floor
                     this.physics.world.setBoundsCollision(true, true, true, false);
 
                     //  Create the bricks in a 10x6 grid
                     this.bricks = this.physics.add.staticGroup({
-                        key: 'assets', frame: [ 'blue1', 'red1', 'green1', 'yellow1', 'silver1', 'purple1' ],
-                        frameQuantity: 30,
-                        gridAlign: { width: 10, height: 6, cellWidth: 128 + 30, cellHeight: 32 + 30, x: 240, y: 150 }
+                        key: 'cherry', frame: ['cherry'],
+                        frameQuantity: 60,
+                        gridAlign: {width: 10, height: 6, cellWidth: 128 + 60, cellHeight: 32 + 60, x: 240, y: 150}
                     });
 
-                    this.ball = this.physics.add.sprite(400,800, 'cherry').setCollideWorldBounds(true).setScale(0.2).setBounce(1);
+                    this.ball = this.physics.add.sprite(400, 800, 'cherry').setCollideWorldBounds(true).setBounce(1);
                     this.ball.setData('onPaddle', true);
 
-                    this.paddle = this.physics.add.sprite(400, 880, 'jar').setImmovable().setScale(0.1);
-                    this.scoreText = this.add.text(48, 48, 'score: 0', { fontSize: '32px', fill: '#000' });
+                    this.paddle = this.physics.add.sprite(400, 880, 'hand').setImmovable();
+                    this.scoreText = this.add.text(48, 48, 'score: 0', {fontSize: '32px', fill: '#000'});
 
                     //  Our colliders
                     this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
@@ -61,16 +60,14 @@ const Game = () => {
                         //  Keep the paddle within the game
                         this.paddle.x = Phaser.Math.Clamp(pointer.x, 52, 1670);
 
-                        if (this.ball.getData('onPaddle'))
-                        {
+                        if (this.ball.getData('onPaddle')) {
                             this.ball.x = this.paddle.x;
                         }
 
                     }, this);
 
                     this.input.on('pointerup', function (pointer) {
-                        if (this.ball.getData('onPaddle') && !this.gameStarted)
-                        {
+                        if (this.ball.getData('onPaddle') && !this.gameStarted) {
                             this.ball.setVelocity(-75, -300);
                             this.ball.setData('onPaddle', false);
                         }
@@ -78,68 +75,24 @@ const Game = () => {
                     }, this);
                 },
 
-                hitBrick: function (ball, brick)
-                {
+                hitBrick: function (ball, brick) {
                     brick.disableBody(true, true);
                     this.score += 10;
                     this.scoreText.setText('score: ' + this.score);
 
-                    if(this.score === 100) {
-                        ball.setVelocity(500, 500);
+                    if (this.score % 100 === 0) {
+                        const multiplier = (this.score / 100 + 2) * 0.4;
+                        ball.setVelocity(ball.body.velocity.x * multiplier, ball.body.velocity.y * multiplier);
                     }
-                    if (this.bricks.countActive() === 0)
-                    {
+                    if (this.bricks.countActive() === 0) {
                         this.resetLevel();
                     }
                 },
 
-                resetBall: function ()
-                {
-                    this.ball.setVelocity(0);
-                    this.ball.setPosition(this.paddle.x, 800);
-                    this.ball.setData('onPaddle', true);
-                },
-
-                resetLevel: function ()
-                {
-                    this.resetBall();
-
-                    this.bricks.children.each(function (brick) {
-
-                        brick.enableBody(false, 0, 0, true, true);
-
-                    });
-                },
-
-                hitPaddle: function (ball, paddle)
-                {
-                    var diff = 0;
-
-                    if (ball.x < paddle.x)
-                    {
-                        //  Ball is on the left-hand side of the paddle
-                        diff = paddle.x - ball.x;
-                        ball.setVelocityX(-10 * diff);
-                    }
-                    else if (ball.x > paddle.x)
-                    {
-                        //  Ball is on the right-hand side of the paddle
-                        diff = ball.x -paddle.x;
-                        ball.setVelocityX(10 * diff);
-                    }
-                    else
-                    {
-                        //  Ball is perfectly in the middle
-                        //  Add a little random X to stop it bouncing straight up!
-                        ball.setVelocityX(2 + Math.random() * 8);
-                    }
-                },
-
-                update: function ()
-                {
-                    if (this.ball.y > 900)
-                    {
-                       // router.push('/game-over');
+                update: function () {
+                    if (this.ball.y > 900) {
+                        setScore(this.score);
+                        router.push('/gameover');
                     }
                 }
 
@@ -152,7 +105,7 @@ const Game = () => {
                 backgroundColor: '#4488aa',
                 parent: "game-container",
                 title: "Pachinko",
-                scene: [ Pachinko ],
+                scene: [Pachinko],
                 physics: {
                     default: 'arcade'
                 },
@@ -169,7 +122,7 @@ const Game = () => {
         initPhaser();
     }, []);
 
-    return <div id="game-container" />;
+    return <div id="game-container"/>;
 };
 
 export default Game;
