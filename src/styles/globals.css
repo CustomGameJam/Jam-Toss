@@ -129,3 +129,23 @@ background-color: #15151B;
     background-repeat: no-repeat;
     background-size: contain;
 }
+
+.gameovergif{
+  background-image: url(/assets/image/gameover.gif);
+    height: 185px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.writeEditing{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  color: white
+                   
+}
+
+.form-control:focus{
+  box-shadow: none !important;
+}
