@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 const {useRouter} = require("next/router");
 
-
 const Game = () => {
     const router = useRouter();
     const [score, setScore] = useState(0);
@@ -23,7 +22,8 @@ const Game = () => {
                         this.bricks;
                         this.paddle;
                         this.ball;
-                        this.scoreText = 'asdqweqweqwe';
+                        this.gameStarted = false;
+                        this.scoreText = null;
                         this.score = 0;
                     },
 
@@ -31,8 +31,6 @@ const Game = () => {
                 {
                     this.load.image('cherry', 'assets/image/cherry.png');
                     this.load.image('jar', 'assets/image/jar.png');
-
-                    this.scoreText = this.add.text(72, 72, 'score: 0', { fontSize: '32px', fill: '#000' });
                 },
 
                 create: function ()
@@ -50,8 +48,8 @@ const Game = () => {
                     this.ball = this.physics.add.sprite(400,800, 'cherry').setCollideWorldBounds(true).setScale(0.2).setBounce(1);
                     this.ball.setData('onPaddle', true);
 
-                    this.paddle = this.physics.add.image(400, 850, 'assets', 'paddle1').setImmovable();
-                    this.scoreText = this.add.text(72, 72, 'score: 0', { fontSize: '32px', fill: '#000' });
+                    this.paddle = this.physics.add.sprite(400, 880, 'jar').setImmovable().setScale(0.1);
+                    this.scoreText = this.add.text(48, 48, 'score: 0', { fontSize: '32px', fill: '#000' });
 
                     //  Our colliders
                     this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
@@ -71,13 +69,12 @@ const Game = () => {
                     }, this);
 
                     this.input.on('pointerup', function (pointer) {
-
-                        if (this.ball.getData('onPaddle'))
+                        if (this.ball.getData('onPaddle') && !this.gameStarted)
                         {
                             this.ball.setVelocity(-75, -300);
                             this.ball.setData('onPaddle', false);
                         }
-
+                        this.gameStarted = true
                     }, this);
                 },
 
@@ -85,7 +82,7 @@ const Game = () => {
                 {
                     brick.disableBody(true, true);
                     this.score += 10;
-                    this.scoreText.setText('Score: ' + this.score);
+                    this.scoreText.setText('score: ' + this.score);
 
                     if(this.score === 100) {
                         ball.setVelocity(500, 500);
@@ -142,7 +139,7 @@ const Game = () => {
                 {
                     if (this.ball.y > 900)
                     {
-                        router.push('/game-over');
+                       // router.push('/game-over');
                     }
                 }
 
@@ -152,6 +149,7 @@ const Game = () => {
                 type: Phaser.AUTO,
                 width: 1720,
                 height: 1080,
+                backgroundColor: '#4488aa',
                 parent: "game-container",
                 title: "Pachinko",
                 scene: [ Pachinko ],
