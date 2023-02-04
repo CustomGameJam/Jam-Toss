@@ -105,3 +105,27 @@ a {
     color-scheme: dark;
   }
 }
+
+.m-0{
+  margin: unset;
+}
+
+.p-3{
+  padding: 3rem;
+}
+
+.bgDark{
+background-color: #15151B;
+}
+
+.fullH{
+  height: 100vh !important;
+}
+
+.winnergif{
+  background-image: url(/assets/image/winner.gif);
+    height: 185px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
