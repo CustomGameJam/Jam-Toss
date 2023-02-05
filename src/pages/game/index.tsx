@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {useGameContext} from "context/GameContext";
-
-const {useRouter} = require("next/router");
+import {ScoreStorage} from "helpers/storage.helper";
 
 const Game = () => {
-    const router = useRouter();
-    const {setScore} = useGameContext();
+    const [gameLoaded, setGameLoaded] = useState(false);
+    const {setScore} = ScoreStorage();
     useEffect(() => {
         async function initPhaser() {
-            const Phaser = await import("phaser");
+            if (gameLoaded) return;
+            const Phaser = await import("phaser") as any;
 
             const Pachinko = new Phaser.Class({
 
@@ -55,7 +54,7 @@ const Game = () => {
                     this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
 
                     //  Input events
-                    this.input.on('pointermove', function (pointer) {
+                    this.input.on('pointermove', (pointer: any) => {
 
                         //  Keep the paddle within the game
                         this.paddle.x = Phaser.Math.Clamp(pointer.x, 52, 1670);
@@ -66,7 +65,7 @@ const Game = () => {
 
                     }, this);
 
-                    this.input.on('pointerup', function (pointer) {
+                    this.input.on('pointerup', function (pointer: any) {
                         if (this.ball.getData('onPaddle') && !this.gameStarted) {
                             this.ball.setVelocity(-75, -300);
                             this.ball.setData('onPaddle', false);
@@ -89,12 +88,39 @@ const Game = () => {
                     }
                 },
 
+                hitPaddle: function (ball, paddle)
+                {
+                    var diff = 0;
+
+                    if (ball.x < paddle.x)
+                    {
+                        //  Ball is on the left-hand side of the paddle
+                        diff = paddle.x - ball.x;
+                        ball.setVelocityX(-10 * diff);
+                    }
+                    else if (ball.x > paddle.x)
+                    {
+                        //  Ball is on the right-hand side of the paddle
+                        diff = ball.x -paddle.x;
+                        ball.setVelocityX(10 * diff);
+                    }
+                    else
+                    {
+                        //  Ball is perfectly in the middle
+                        //  Add a little random X to stop it bouncing straight up!
+                        ball.setVelocityX(2 + Math.random() * 8);
+                    }
+                },
+
                 update: function () {
-                    if (this.ball.y > 900) {
+                    if (this.ball.y > 900 && setScore) {
                         setScore(this.score);
-                        game.destroy(true);
+                        const canvas = document.querySelector("canvas");
+                        if (canvas) {
+                            canvas.remove();
+                        }
                         setTimeout(() => {
-                            router.push('/gameover');
+                            window.location.href = "/gameover";
                         }, 1000);
                     }
                 }
@@ -103,10 +129,11 @@ const Game = () => {
 
             var config = {
                 type: Phaser.AUTO,
+                id: "pachinko-game",
                 width: 1720,
                 height: 1080,
                 backgroundColor: '#4488aa',
-                parent: "game-container",
+                parent: "game",
                 title: "Pachinko",
                 scene: [Pachinko],
                 physics: {
@@ -119,13 +146,21 @@ const Game = () => {
                 }
             };
 
-            var game = new Phaser.Game(config);
+            new Phaser.Game(config);
+            setGameLoaded(true);
         }
 
-        initPhaser();
+        initPhaser().then(() => {
+                const canvasElements = Array.from(document.querySelectorAll("canvas"));
+                if (canvasElements.length > 1) {
+                    const secondCanvas = canvasElements.slice(1)[0];
+                    secondCanvas.parentNode?.removeChild(secondCanvas);
+                }
+            }
+        )
     }, []);
 
-    return <div id="game-container"/>;
+    return <div id="game"></div>;
 };
 
 export default Game;

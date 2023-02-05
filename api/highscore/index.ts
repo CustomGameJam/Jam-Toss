@@ -2,8 +2,8 @@ import {api} from "api/index";
 
 export const addHighscore = async (name: string, score: number) => {
     const { data } = await api.post("/highscore", {
-        name,
-        score,
+        name:name,
+        score:score,
     });
     return data;
 }

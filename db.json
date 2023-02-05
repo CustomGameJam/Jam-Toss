@@ -1,16 +1,19 @@
 {
-  "highscores": [
+  "highscore": [
     {
-      "name": "John",
-      "score": 100
+      "name": "50",
+      "score": 40,
+      "id": 1
     },
     {
-      "name": "Jane",
-      "score": 90
+      "name": "yeni skor",
+      "score": 40,
+      "id": 2
     },
     {
-      "name": "Joe",
-      "score": 80
+      "name": "seksen seni bir siksem",
+      "score": 60,
+      "id": 3
     }
   ]
 }
