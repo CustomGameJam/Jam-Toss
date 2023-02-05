@@ -28,7 +28,7 @@ const GameOver = () => {
     }, []);
 
     return (
-        <div className='p-3 fullH' style={{backgroundColor: 'black'}}>
+        <div className="gameOverContainer p-3 fullH">
             <Global
                 styles={css`
                   canvas {
@@ -79,15 +79,13 @@ const GameOver = () => {
                             border: "1px solid #141619",
                             borderRadius: "unset",
                             backgroundColor: "darkgoldenrod",
-                            width: "264px"
+                            width: "436px"
                         }}>
                             Try Again
                         </Button>
                     </div>
-
                 </Col>
             </Row>
-
         </div>
     )
 }

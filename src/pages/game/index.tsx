@@ -2,11 +2,9 @@ import React, {useEffect, useState} from "react";
 import {ScoreStorage} from "helpers/storage.helper";
 
 const Game = () => {
-    const [gameLoaded, setGameLoaded] = useState(false);
     const {setScore} = ScoreStorage();
     useEffect(() => {
         async function initPhaser() {
-            if (gameLoaded) return;
             const Phaser = await import("phaser") as any;
 
             const Pachinko = new Phaser.Class({
@@ -147,7 +145,6 @@ const Game = () => {
             };
 
             new Phaser.Game(config);
-            setGameLoaded(true);
         }
 
         initPhaser().then(() => {
